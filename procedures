@@ -1,0 +1,23 @@
+--- inserting new user (registration)
+PROCEDURE insertUser
+  (v_user_uid      IN users.user_uid%TYPE,
+   v_first_name       IN users.first_name%TYPE,
+   v_last_name    IN users.v_last_name%TYPE,
+   v_city IN users.city%TYPE,
+   v_contacts IN users.contacts%TYPE,
+   v_email IN users.email%TYPE,
+   v_password IN users.password,
+   v_image IN users.user_image%TYPE) IS
+
+BEGIN
+    INSERT INTO users (user_uid, first_name, last_name, city, contacts, email, password)
+    VALUES(
+      v_user_uid,
+      v_first_name,
+      v_last_name,
+      v_city,
+      v_contacts,
+      v_email,
+      v_password,
+      v_image);
+END;
