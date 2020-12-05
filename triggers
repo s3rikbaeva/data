@@ -1,0 +1,39 @@
+--------------------------------------------------------------------------------create procedure to create log table for triggers
+create or replace procedure create_log_table(table_name in varchar2) IS
+    create_query varchar2(255);
+BEGIN
+    create_query := 'CREATE TABLE'||' '||table_name ||''||'_LOG (ID NUMBER(6), OPERATION_DATE DATE, OLD_ID NUMBER(6), NEW_ID NUMBER(6), 
+                     OLD_NAME VARCHAR2(20), NEW_NAME VARCHAR(20), ACTION VARCHAR2(20), ACTIONAUTHOR VARCHAR2(20))';
+    execute immediate create_query;
+END;
+
+begin
+    create_log_table('{some input data, Aru}');
+end;
+--------------------------------------------------------------------------------delete trigger USERS
+CREATE OR REPLACE TRIGGER t2_delete
+    AFTER DELETE ON users FOR EACH ROW
+BEGIN
+    INSERT INTO users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, 
+                     OLD_NAME, NEW_NAME, ACTION,ACTIONAUTHOR)
+    VALUES (:OLD.id, SYSDATE, :OLD.id, :NEW.ID, :OLD.NAME, :NEW.NAME, 'Delete',(SELECT USER FROM DUAL) );
+END;
+
+-----------------------------------------------
+CREATE OR REPLACE TRIGGER t2_insert
+    AFTER INSERT ON users FOR EACH ROW
+BEGIN
+    INSERT INTO users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, 
+                     OLD_NAME, NEW_NAME, ACTION,ACTIONAUTHOR)
+    VALUES (:OLD.user_uid, SYSDATE, :OLD.user_uid, :NEW.user_uid, :OLD.first_name, :NEW.first_name, 'Insert',(SELECT USER FROM DUAL) );
+END;
+
+insert into users(ID,NAME) values(101, 'Abay');
+-----------------------------------------------
+CREATE OR REPLACE TRIGGER t2_update
+    AFTER update ON users FOR EACH ROW
+BEGIN
+    INSERT INTO users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, 
+                     OLD_NAME, NEW_NAME, ACTION,ACTIONAUTHOR)
+    VALUES (:OLD.id, SYSDATE, :OLD.id, :NEW.ID, :OLD.NAME, :NEW.NAME, 'Update',(SELECT USER FROM DUAL) );
+END;
