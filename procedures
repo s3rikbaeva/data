@@ -25,8 +25,7 @@ END;
 CREATE OR REPLACE PROCEDURE reset_sequence(sequence IN VARCHAR2, value NUMBER) IS
   BEGIN
     execute immediate 'DROP SEQUENCE ' || sequence;
-    execute immediate 'CREATE SEQUENCE ' || sequence ' start with ' || value || ' INCREMENT BY 1 START WITH 1 MINVALUE 1 MAXVALUE 1000
-    CYCLE CACHE 2;'
+    execute immediate 'CREATE SEQUENCE ' || sequence || ' start with ' || value || ' INCREMENT BY 1 START WITH 1 MINVALUE 1 MAXVALUE 1000 CYCLE CACHE 2';
   END;
 -----------------------------------------------------------------------------------------------delete user from all tables
 Suppose, we have to delete user with id = 10123
