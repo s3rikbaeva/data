@@ -1,18 +1,18 @@
 -----------------------------------------------------------------------------------------------regex for checking email format
-ALTER TABLE users add constraint email_check check(regexp_like(email, '.+@.+\..+'));
+ALTER TABLE eco_users add constraint email_check check(regexp_like(email, '.+@.+\..+'));
 -----------------------------------------------------------------------------------------------inserting new user (registration)
-PROCEDURE insertUser
-  (v_user_uid IN users.user_uid%TYPE,
-   v_first_name IN users.first_name%TYPE,
-   v_last_name IN users.last_name%TYPE,
-   v_city IN users.city%TYPE,
-   v_contacts IN users.contacts%TYPE,
-   v_email IN users.email%TYPE,
-   v_password IN users.password,
-   v_image IN users.user_image%TYPE) IS
+CREATE OR REPLACE PROCEDURE insertUser
+  (v_user_uid IN NUMBER,
+   v_first_name       IN VARCHAR2,
+   v_last_name    IN VARCHAR2,
+   v_city IN VARCHAR2,
+   v_contacts IN NUMBER,
+   v_email IN VARCHAR2,
+   v_password IN VARCHAR2,
+   v_image IN BLOB) IS
 BEGIN
-    INSERT INTO users (user_uid, first_name, last_name, city, contacts, email, password, image)
-    VALUES(v_user_uid, v_first_name, v_last_name, v_city, v_contacts, v_email, v_password, v_image);
+    INSERT INTO eco_users (user_uid, first_name, last_name, city, CONTACT_NUMBER, email, password, PROFILE_IMAGE) VALUES(
+    v_user_uid, v_first_name, v_last_name, v_city, v_contacts, v_email, v_password, v_image);
 END;
 -----------------------------------------------------------------------------------------------drop existing sequence
 CREATE OR REPLACE PROCEDURE reset_sequence(sequence IN VARCHAR2, value NUMBER) IS
