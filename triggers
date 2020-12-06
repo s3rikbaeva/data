@@ -1,39 +1,175 @@
---------------------------------------------------------------------------------create procedure to create log table for triggers
-create or replace procedure create_log_table(table_name in varchar2) IS
+--------------------------------------------------------------------------------create procedure to create log table for user_triggers
+create or replace procedure create_log_table1(table_name in varchar2) IS
     create_query varchar2(255);
 BEGIN
-    create_query := 'CREATE TABLE'||' '||table_name ||''||'_LOG (ID NUMBER(6), OPERATION_DATE DATE, OLD_ID NUMBER(6), NEW_ID NUMBER(6), 
-                     OLD_NAME VARCHAR2(20), NEW_NAME VARCHAR(20), ACTION VARCHAR2(20), ACTIONAUTHOR VARCHAR2(20))';
+    create_query := 'CREATE TABLE'||' '||table_name ||''||'_LOG (
+                     ID NUMBER(5), 
+                     OPERATION_DATE DATE, 
+                     OLD_ID NUMBER(5), 
+                     NEW_ID NUMBER(5), 
+                     OLD_EMAIL VARCHAR2(50), 
+                     NEW_EMAIL VARCHAR(50), 
+                     ACTION VARCHAR2(20), 
+                     ACTIONAUTHOR VARCHAR2(20))';
     execute immediate create_query;
 END;
 
 begin
-    create_log_table('{some input data, Aru}');
+    create_log_table1('eco_users');
 end;
---------------------------------------------------------------------------------delete trigger USERS
-CREATE OR REPLACE TRIGGER t2_delete
-    AFTER DELETE ON users FOR EACH ROW
+-------------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER user_triggers
+    AFTER INSERT OR UPDATE OR DELETE ON eco_users FOR EACH ROW
 BEGIN
-    INSERT INTO users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, 
-                     OLD_NAME, NEW_NAME, ACTION,ACTIONAUTHOR)
-    VALUES (:OLD.id, SYSDATE, :OLD.id, :NEW.ID, :OLD.NAME, :NEW.NAME, 'Delete',(SELECT USER FROM DUAL) );
+    IF DELETING THEN
+        INSERT INTO eco_users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, OLD_EMAIL, NEW_EMAIL, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.user_uid, :NEW.user_uid, :OLD.email, :NEW.email,'Delete',(SELECT USER FROM DUAL));
+    END IF;
+    IF INSERTING THEN 
+        INSERT INTO eco_users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, OLD_EMAIL, NEW_EMAIL, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.user_uid, :NEW.user_uid, :OLD.email, :NEW.email,'Insert',(SELECT USER FROM DUAL) );
+    END IF;
+    IF UPDATING THEN 
+        INSERT INTO eco_users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, OLD_EMAIL, NEW_EMAIL, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.user_uid, :NEW.user_uid, :OLD.email, :NEW.email,'Update',(SELECT USER FROM DUAL) );
+    END IF;
 END;
 
------------------------------------------------
-CREATE OR REPLACE TRIGGER t2_insert
-    AFTER INSERT ON users FOR EACH ROW
+--------------------------------------------------------------------------------create procedure to create log table for pcr_triggers
+create or replace procedure create_log_table2(table_name in varchar2) IS
+    create_query varchar2(255);
 BEGIN
-    INSERT INTO users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, 
-                     OLD_NAME, NEW_NAME, ACTION,ACTIONAUTHOR)
-    VALUES (:OLD.user_uid, SYSDATE, :OLD.user_uid, :NEW.user_uid, :OLD.first_name, :NEW.first_name, 'Insert',(SELECT USER FROM DUAL) );
+    create_query := 'CREATE TABLE'||' '||table_name ||''||'_LOG (
+                     ID NUMBER(5), 
+                     OPERATION_DATE DATE, 
+                     OLD_PID NUMBER(5), 
+                     NEW_PID NUMBER(5), 
+                     OLD_CID NUMBER(4),
+                     NEW_CID NUMBER(4),
+                     OLD_UID NUMBER(5),
+                     NEW_UID NUMBER(5),
+                     OLD_PUNKT VARCHAR2(1024), 
+                     NEW_PUNKT VARCHAR2(1024), 
+                     OLD_DATE VARCHAR2(256),
+                     NEW_DATE VARCHAR2(256),
+                     ACTION VARCHAR2(20), 
+                     ACTIONAUTHOR VARCHAR2(20))';
+    execute immediate create_query;
 END;
 
-insert into users(ID,NAME) values(101, 'Abay');
------------------------------------------------
-CREATE OR REPLACE TRIGGER t2_update
-    AFTER update ON users FOR EACH ROW
+begin
+    create_log_table2('online_pcr');
+end;
+-------------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER pcr_triggers
+    AFTER INSERT OR UPDATE OR DELETE ON online_pcr FOR EACH ROW
 BEGIN
-    INSERT INTO users_log (ID, OPERATION_DATE, OLD_ID, NEW_ID, 
-                     OLD_NAME, NEW_NAME, ACTION,ACTIONAUTHOR)
-    VALUES (:OLD.id, SYSDATE, :OLD.id, :NEW.ID, :OLD.NAME, :NEW.NAME, 'Update',(SELECT USER FROM DUAL) );
+    IF DELETING THEN
+        INSERT INTO online_pcr_log (ID, OPERATION_DATE, OLD_PID, 
+                     NEW_PID, 
+                     OLD_CID,
+                     NEW_CID,
+                     OLD_UID,
+                     NEW_UID,
+                     OLD_PUNKT, 
+                     NEW_PUNKT, 
+                     OLD_DATE,
+                     NEW_DATE, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.pcr_id, :NEW.pcr_id, :OLD.center_id, :NEW.center_id, :OLD.user_uid, :NEW.user_uid, :OLD.punkt, :NEW.punkt, :OLD.pcr_date, :NEW.pcr_date,'Delete',(SELECT USER FROM DUAL));
+    END IF;
+    IF INSERTING THEN 
+        INSERT INTO online_pcr_log (ID, OPERATION_DATE, OLD_PID, 
+                     NEW_PID, 
+                     OLD_CID,
+                     NEW_CID,
+                     OLD_UID,
+                     NEW_UID,
+                     OLD_PUNKT, 
+                     NEW_PUNKT, 
+                     OLD_DATE,
+                     NEW_DATE, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.pcr_id, :NEW.pcr_id, :OLD.center_id, :NEW.center_id, :OLD.user_uid, :NEW.user_uid, :OLD.punkt, :NEW.punkt, :OLD.pcr_date, :NEW.pcr_date,'Insert',(SELECT USER FROM DUAL));
+    END IF;
+    IF UPDATING THEN 
+        INSERT INTO online_pcr_log (ID, OPERATION_DATE, OLD_PID, 
+                     NEW_PID, 
+                     OLD_CID,
+                     NEW_CID,
+                     OLD_UID,
+                     NEW_UID,
+                     OLD_PUNKT, 
+                     NEW_PUNKT, 
+                     OLD_DATE,
+                     NEW_DATE, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.pcr_id, :NEW.pcr_id, :OLD.center_id, :NEW.center_id, :OLD.user_uid, :NEW.user_uid, :OLD.punkt, :NEW.punkt, :OLD.pcr_date, :NEW.pcr_date,'Update',(SELECT USER FROM DUAL));
+    END IF;
+END;
+--------------------------------------------------------------------------------create procedure to create log table for consultation_triggers
+create or replace procedure create_log_table3(table_name in varchar2) IS
+    create_query varchar2(255);
+BEGIN
+    create_query := 'CREATE TABLE'||' '||table_name ||''||'_LOG (
+                     ID NUMBER(5), 
+                     OPERATION_DATE DATE, 
+                     OLD_CID NUMBER(5), 
+                     NEW_CID NUMBER(5), 
+                     OLD_UID NUMBER(4),
+                     NEW_UID NUMBER(4),
+                     OLD_DID NUMBER(5),
+                     NEW_DID NUMBER(5),
+                     OLD_CLINICS VARCHAR2(1024), 
+                     NEW_CLINICS VARCHAR2(1024), 
+                     OLD_DATE VARCHAR2(256),
+                     NEW_DATE VARCHAR2(256),
+                     ACTION VARCHAR2(20), 
+                     ACTIONAUTHOR VARCHAR2(20))';
+    execute immediate create_query;
+END;
+
+begin
+    create_log_table3('online_consultation');
+end;
+------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER consultation_triggers
+    AFTER INSERT OR UPDATE OR DELETE ON online_consultation FOR EACH ROW
+BEGIN
+    IF DELETING THEN
+        INSERT INTO online_consultation_log (ID, OPERATION_DATE, OLD_CID, 
+                     NEW_CID, 
+                     OLD_UID,
+                     NEW_UID,
+                     OLD_DID,
+                     NEW_DID,
+                     OLD_CLINICS, 
+                     NEW_CLINICS, 
+                     OLD_DATE,
+                     NEW_DATE, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.consultation_id, :NEW.consultation_id, :OLD.user_uid, :NEW.user_uid, :OLD.doctor_id, :NEW.doctor_id, :OLD.clinics, :NEW.clinincs, :OLD.consultation_date, :NEW.consultation_date,'Delete',(SELECT USER FROM DUAL));
+    END IF;
+    IF INSERTING THEN 
+        INSERT INTO online_consultation_log (ID, OPERATION_DATE, OLD_CID, 
+                     NEW_CID, 
+                     OLD_UID,
+                     NEW_UID,
+                     OLD_DID,
+                     NEW_DID,
+                     OLD_CLINICS, 
+                     NEW_CLINICS, 
+                     OLD_DATE,
+                     NEW_DATE, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.consultation_id, :NEW.consultation_id, :OLD.user_uid, :NEW.user_uid, :OLD.doctor_id, :NEW.doctor_id, :OLD.clinics, :NEW.clinincs, :OLD.consultation_date, :NEW.consultation_date,'Insert',(SELECT USER FROM DUAL));
+    END IF;
+    IF UPDATING THEN 
+        INSERT INTO online_consultation_log (ID, OPERATION_DATE, OLD_CID, 
+                     NEW_CID, 
+                     OLD_UID,
+                     NEW_UID,
+                     OLD_DID,
+                     NEW_DID,
+                     OLD_CLINICS, 
+                     NEW_CLINICS, 
+                     OLD_DATE,
+                     NEW_DATE, ACTION, ACTIONAUTHOR)
+        VALUES (:OLD.user_uid, SYSDATE, :OLD.consultation_id, :NEW.consultation_id, :OLD.user_uid, :NEW.user_uid, :OLD.doctor_id, :NEW.doctor_id, :OLD.clinics, :NEW.clinincs, :OLD.consultation_date, :NEW.consultation_date,'Update',(SELECT USER FROM DUAL));
+    END IF;
 END;
