@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION usersAutoCommit
 IS
    n_count NUMBER;
    cursor c1 is
-   SELECT COUNT(*)
+   SELECT user_uid
      FROM eco_users
      WHERE email IS NOT NULL;
 BEGIN
