@@ -1,0 +1,21 @@
+CREATE OR REPLACE FUNCTION usersAutoCommit
+   RETURN number
+IS
+   n_count NUMBER;
+   cursor c1 is
+   SELECT COUNT(*)
+     FROM eco_users
+     WHERE email IS NOT NULL;
+BEGIN
+   OPEN c1;
+   FETCH c1 INTO n_count;
+   IF c1%notfound THEN
+      n_count := 9999;
+   END IF;
+   CLOSE c1;
+   COMMIT;
+RETURN n_count;
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
